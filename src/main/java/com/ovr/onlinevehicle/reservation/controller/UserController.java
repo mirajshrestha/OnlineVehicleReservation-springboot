@@ -52,10 +52,15 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<String> processRegistration(@RequestPart("image") MultipartFile image, @RequestPart("user") User user) throws IOException {
+	public ResponseEntity<String> processRegistration(@RequestPart("image") MultipartFile image, @RequestPart("user") User user, @RequestParam("categories") List<String> categories) throws IOException {
 		
 		String imagePath = userService.saveImage(image);
 		user.setLicense_name(imagePath);
+
+		if (categories != null && !categories.isEmpty()) {
+			String categoriesString = String.join(",", categories);
+			user.setCategories(categoriesString);
+		}
 		
 		userService.registerUser(user);
 		return ResponseEntity.ok("User registration Successful");

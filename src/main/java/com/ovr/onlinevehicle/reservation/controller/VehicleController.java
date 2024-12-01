@@ -35,144 +35,155 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/api/vehicle")
 public class VehicleController {
-	@Autowired
-	private VehicleService vehicleService;
-	
-	@Autowired
-	private VehicleRepository vehicleRepository;
+    @Autowired
+    private VehicleService vehicleService;
 
-	@PostMapping("/add")
-	public ResponseEntity<String> registerVehicle(@RequestPart("image") MultipartFile image,
-			@RequestPart("vehicle") Vehicles vehicles, HttpServletRequest request) throws IOException {
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
-		Long ownerId = (Long) request.getSession().getAttribute("ownerId");
-		if (ownerId == null) {
-			return ResponseEntity.badRequest().body("OwnerId not found");
-		}
+    @PostMapping("/add")
+    public ResponseEntity<String> registerVehicle(@RequestPart("image") MultipartFile image,
+                                                  @RequestPart("vehicle") Vehicles vehicles, HttpServletRequest request) throws IOException {
 
-		Owners owners = new Owners();
-		owners.setOwners_id(ownerId);
-		vehicles.setOwners(owners);
+        Long ownerId = (Long) request.getSession().getAttribute("ownerId");
+        if (ownerId == null) {
+            return ResponseEntity.badRequest().body("OwnerId not found");
+        }
 
-		System.out.println("Data " + vehicles);
+        Owners owners = new Owners();
+        owners.setOwners_id(ownerId);
+        vehicles.setOwners(owners);
 
-		String imagePath = vehicleService.saveImage(image);
-		vehicles.setCarimg(imagePath);
+        System.out.println("Data " + vehicles);
 
-		vehicleService.registerVehicle(vehicles);
-		return ResponseEntity.ok("Vehicle registration Successful");
+        String imagePath = vehicleService.saveImage(image);
+        vehicles.setCarimg(imagePath);
 
-	}
+        vehicleService.registerVehicle(vehicles);
+        return ResponseEntity.ok("Vehicle registration Successful");
 
-	@GetMapping("/owner")
-	public ResponseEntity<List<Vehicles>> getOwnedVehicles(HttpSession session) {
-		Long ownerId = (Long) session.getAttribute("ownerId");
-		List<Vehicles> vehicles = vehicleService.getOwnedVehicles(ownerId);
+    }
 
-		return ResponseEntity.ok(vehicles);
+    @GetMapping("/owner")
+    public ResponseEntity<List<Vehicles>> getOwnedVehicles(HttpSession session) {
+        Long ownerId = (Long) session.getAttribute("ownerId");
+        List<Vehicles> vehicles = vehicleService.getOwnedVehicles(ownerId);
 
-	}
+        return ResponseEntity.ok(vehicles);
 
-	@GetMapping("/search")
-	public ResponseEntity<List<Vehicles>> searchVehicles(@RequestParam String location, @RequestParam Date pickUpDate,
-			@RequestParam Date returnDate) {
-		List<Vehicles> searchResults = vehicleService.searchVehicles(location, pickUpDate, returnDate);
-		return ResponseEntity.ok(searchResults);
-	}
+    }
 
-	@GetMapping("/{vehicleId}")
-	public ResponseEntity<Vehicles> getVehicleDetails(@PathVariable Long vehicleId) {
-		Vehicles vehicles = vehicleService.getVehicleById(vehicleId);
-		if (vehicles == null) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(vehicles);
-	}
+    @GetMapping("/search")
+    public ResponseEntity<List<Vehicles>> searchVehicles(@RequestParam String location, @RequestParam Date pickUpDate,
+                                                         @RequestParam Date returnDate) {
+        List<Vehicles> searchResults = vehicleService.searchVehicles(location, pickUpDate, returnDate);
+        return ResponseEntity.ok(searchResults);
+    }
 
-	@GetMapping("/all")
-	public List<Vehicles> getAllVehicles() {
-		return vehicleService.getAllVehicles();
-	}
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<Vehicles> getVehicleDetails(@PathVariable Long vehicleId) {
+        Vehicles vehicles = vehicleService.getVehicleById(vehicleId);
+        if (vehicles == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(vehicles);
+    }
 
-	@DeleteMapping("/{vehicleId}")
-	public ResponseEntity<String> deleteVehicle(@PathVariable("vehicleId") Long vehicleId) {
-		boolean deleted = vehicleService.deleteVehicle(vehicleId);
-		if (deleted) {
-			return ResponseEntity.ok("Vehicle deleted succesfully");
-		} else {
-			return ResponseEntity.badRequest().body("Failed to delete vehicle");
-		}
-	}
+    @GetMapping("/all")
+    public List<Vehicles> getAllVehicles() {
+        return vehicleService.getAllVehicles();
+    }
 
-	@GetMapping("/locations")
-	public ResponseEntity<List<Object[]>> getVehiclesWithLocations() {
-		List<Object[]> results = vehicleService.getVehiclesWithLocations();
-		return ResponseEntity.ok(results);
-	}
+    @DeleteMapping("/{vehicleId}")
+    public ResponseEntity<String> deleteVehicle(@PathVariable("vehicleId") Long vehicleId) {
+        boolean deleted = vehicleService.deleteVehicle(vehicleId);
+        if (deleted) {
+            return ResponseEntity.ok("Vehicle deleted succesfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to delete vehicle");
+        }
+    }
 
-	@PutMapping("/update/{vehicleId}")
-	public ResponseEntity<String> updateVehicle(@PathVariable Long vehicleId, @RequestBody Vehicles updatedVehicle,
-			HttpSession session) {
-		// Check if the owner is authenticated
-		if (session != null && session.getAttribute("ownerId") != null) {
-			Long ownerId = (Long) session.getAttribute("ownerId");
+    @GetMapping("/locations")
+    public ResponseEntity<List<Object[]>> getVehiclesWithLocations() {
+        List<Object[]> results = vehicleService.getVehiclesWithLocations();
+        return ResponseEntity.ok(results);
+    }
 
-			// Fetch the existing vehicle from the database
-			Vehicles existingVehicle = vehicleService.getVehicleById(vehicleId);
+    @GetMapping("/categories")
+    public ResponseEntity<List<Object[]>> getVehiclesWithCategories() {
+        List<Object[]> results = vehicleService.getVehiclesWithCategories();
+        return ResponseEntity.ok(results);
+    }
 
-			// Check if the vehicle exists and belongs to the authenticated owner
-			if (existingVehicle != null && existingVehicle.getOwners().getOwners_id().equals(ownerId)) {
-				// Update the vehicle details
-				existingVehicle.setManufacturer(updatedVehicle.getManufacturer());
-				existingVehicle.setModel(updatedVehicle.getModel());
-				existingVehicle.setDailyfare(updatedVehicle.getDailyfare());
-				existingVehicle.setFromdate(updatedVehicle.getFromdate());
-				existingVehicle.setTodate(updatedVehicle.getTodate());
-				existingVehicle.setAvailablelocation(updatedVehicle.getAvailablelocation());
-				existingVehicle.setDescription(updatedVehicle.getDescription());
+    @PutMapping("/update/{vehicleId}")
+    public ResponseEntity<String> updateVehicle(@PathVariable Long vehicleId, @RequestBody Vehicles updatedVehicle,
+                                                HttpSession session) {
+        // Check if the owner is authenticated
+        if (session != null && session.getAttribute("ownerId") != null) {
+            Long ownerId = (Long) session.getAttribute("ownerId");
 
-				// Save the updated vehicle to the database
-				vehicleService.updateVehicle(existingVehicle);
+            // Fetch the existing vehicle from the database
+            Vehicles existingVehicle = vehicleService.getVehicleById(vehicleId);
 
-				return ResponseEntity.ok("Vehicle updated successfully");
-			}
-		}
+            // Check if the vehicle exists and belongs to the authenticated owner
+            if (existingVehicle != null && existingVehicle.getOwners().getOwners_id().equals(ownerId)) {
+                // Update the vehicle details
+                existingVehicle.setManufacturer(updatedVehicle.getManufacturer());
+                existingVehicle.setModel(updatedVehicle.getModel());
+                existingVehicle.setDailyfare(updatedVehicle.getDailyfare());
+                existingVehicle.setFromdate(updatedVehicle.getFromdate());
+                existingVehicle.setTodate(updatedVehicle.getTodate());
+                existingVehicle.setAvailablelocation(updatedVehicle.getAvailablelocation());
+                existingVehicle.setDescription(updatedVehicle.getDescription());
 
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
-	}
-	
-	@PutMapping("/request-feature/{id}")
-	public ResponseEntity<String> requestFeature(@PathVariable Long id) {
-	    Optional<Vehicles> optionalVehicle = vehicleRepository.findById(id);
-	    if (optionalVehicle.isPresent()) {
-	        Vehicles vehicle = optionalVehicle.get();
-	        if (vehicle.getFeature() == null) {
-	            // Only update the feature if it's currently null
-	            vehicle.setFeature("Requested");
-	            vehicleRepository.save(vehicle);
-	            return ResponseEntity.ok("Feature requested successfully");
-	        } else {
-	            return ResponseEntity.badRequest().body("Feature is already set");
-	        }
-	    } else {
-	        return ResponseEntity.notFound().build();
-	    }
-	}
-	
-	@PutMapping("/{vehicleId}")
-	  public ResponseEntity<String> updateFeatureStatus(
-	      @PathVariable Long vehicleId,
-	      @RequestBody Map<String, String> updateRequest
-	  ) {
-	    String featureStatus = updateRequest.get("feature");
-	    if (featureStatus == null || (!featureStatus.equals("Accepted") && !featureStatus.equals("Rejected"))) {
-	      return ResponseEntity.badRequest().body("Invalid feature status");
-	    }
+                // Save the updated vehicle to the database
+                vehicleService.updateVehicle(existingVehicle);
 
-	    // Assuming you have a method to update the feature status in your service
-	    vehicleService.updateFeatureStatus(vehicleId, featureStatus);
+                return ResponseEntity.ok("Vehicle updated successfully");
+            }
+        }
 
-	    return ResponseEntity.ok("Feature status updated successfully");
-	  }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+    }
+
+    @PutMapping("/request-feature/{id}")
+    public ResponseEntity<String> requestFeature(@PathVariable Long id) {
+        Optional<Vehicles> optionalVehicle = vehicleRepository.findById(id);
+        if (optionalVehicle.isPresent()) {
+            Vehicles vehicle = optionalVehicle.get();
+            if (vehicle.getFeature() == null) {
+                // Only update the feature if it's currently null
+                vehicle.setFeature("Requested");
+                vehicleRepository.save(vehicle);
+                return ResponseEntity.ok("Feature requested successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Feature is already set");
+            }
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{vehicleId}")
+    public ResponseEntity<String> updateFeatureStatus(
+            @PathVariable Long vehicleId,
+            @RequestBody Map<String, String> updateRequest
+    ) {
+        String featureStatus = updateRequest.get("feature");
+        if (featureStatus == null || (!featureStatus.equals("Accepted") && !featureStatus.equals("Rejected"))) {
+            return ResponseEntity.badRequest().body("Invalid feature status");
+        }
+
+        vehicleService.updateFeatureStatus(vehicleId, featureStatus);
+
+        return ResponseEntity.ok("Feature status updated successfully");
+    }
+
+    @GetMapping("/recommended/{userId}")
+	public ResponseEntity<List<Vehicles>> getRecommendedVehicles(@PathVariable Long userId){
+        List<Vehicles> recommendedVehicles = vehicleService.getRecommendedVehicles(userId);
+        return ResponseEntity.ok(recommendedVehicles);
+    }
 
 }

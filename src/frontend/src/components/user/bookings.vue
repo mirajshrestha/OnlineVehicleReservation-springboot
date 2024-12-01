@@ -55,13 +55,6 @@
               ><span class="ms-2">{{ user.name }}</span>
             </button>
             <div class="dropdown-menu" aria-labelledby="triggerId">
-              <button
-                class="dropdown-item"
-                href="#"
-                onclick="openSection('Profile')"
-              >
-                Profile
-              </button>
               <button class="dropdown-item" href="#" @click="logout">
                 Logout
               </button>

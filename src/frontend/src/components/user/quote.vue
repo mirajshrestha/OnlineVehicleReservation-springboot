@@ -2,10 +2,7 @@
   <div v-if="loggedIn">
     <navbar />
     <section></section>
-    <form
-      @submit.prevent="confirmBooking"
-      style="margin: 5rem; border: 1px solid #cecaca; padding: 3rem"
-    >
+    <form @submit.prevent="confirmBooking" style="margin: 5rem; border: 1px solid #cecaca; padding: 3rem">
       <h2>Personal Details</h2>
       <table class="form-table">
         <tr>
@@ -42,28 +39,26 @@
         <tr>
           <td>
             <label>Vehicle Location:</label>
-            <input
-              type="text"
-              v-model="vehicleDetails.availablelocation"
-              disabled
-            />
+            <input type="text" v-model="vehicleDetails.availablelocation" disabled />
           </td>
         </tr>
         <br />
         <tr>
           <td>
             <label>From Date:</label>
-            <input type="date" :value="pickUpDate" disabled />
+            <input type="date" id="pickUpDate" v-model="pickUpDate" :min="new Date().toISOString().split('T')[0]" />
           </td>
           <td>
             <label>To Date:</label>
-            <input type="date" :value="returnDate" disabled />
+            <input type="date" id="returnDate" v-model="returnDate" :min="pickUpDate" />
           </td>
         </tr>
         <hr />
         <br />
         <tr>
-          <td colspan="2"><h3>Vehicle Details</h3></td>
+          <td colspan="2">
+            <h3>Vehicle Details</h3>
+          </td>
         </tr>
         <tr>
           <td>
@@ -77,11 +72,7 @@
               <tr>&nbsp;
                 <th class="odd">Vehicle Model</th>
                 <td class="odd">
-                  <input
-                    type="text"
-                    style="border: none"
-                    v-model="vehicleDetails.model"
-                  />
+                  <input type="text" style="border: none" v-model="vehicleDetails.model" />
                 </td>
               </tr>
               <tr>&nbsp;
@@ -91,11 +82,7 @@
               <tr>&nbsp;
                 <th class="odd">Vehicle Owner</th>
                 <td class="odd">
-                  &nbsp; <input
-                    type="text"
-                    style="border: none"
-                    v-model="vehicleDetails.owners.fullname"
-                  />
+                  &nbsp; <input type="text" style="border: none" v-model="vehicleDetails.owners.fullname" />
                 </td>
               </tr>
 
@@ -128,11 +115,7 @@
               <tr>
                 <th>&nbsp;</th>
                 <td>
-                  <input
-                    type="submit"
-                    value="Confirm Booking"
-                    style="width: 100%"
-                  />
+                  <input type="submit" value="Confirm Booking" style="width: 100%" />
                 </td>
               </tr>
             </table>
@@ -194,8 +177,8 @@ export default {
         const fromDate = new Date(this.pickUpDate);
         const toDate = new Date(this.returnDate);
         const timeDiff = toDate.getTime() - fromDate.getTime();
-        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-        this.bookedDays = diffDays;
+        const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+        this.bookedDays = diffDays > 0 ? diffDays : 1;
       }
     },
 
@@ -233,11 +216,14 @@ export default {
 
         console.log("fromDate", this.pickUpDate);
         console.log("toDate", this.returnDate);
+
+        const totalFare = this.bookedDays * this.vehicleDetails.dailyfare;
+
         const bookingData = {
           fromDate: this.pickUpDate,
           toDate: this.returnDate,
           booked_days: this.bookedDays,
-          total_fare: this.vehicleDetails.dailyfare,
+          total_fare: totalFare,
           vehicle_id: this.vehicleDetails.vehicle_id,
           owners_id: this.vehicleDetails.owners.owners_id,
           user_id: this.user.user_id,
@@ -269,4 +255,3 @@ export default {
   },
 };
 </script>
-

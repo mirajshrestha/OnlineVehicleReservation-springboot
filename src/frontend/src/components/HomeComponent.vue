@@ -16,25 +16,16 @@
             <option value="Lalitpur">Lalitpur</option>
             <option value="Bhaktapur">Bhaktapur</option>
             <option value="Makawanpur">Makawanpur</option>
+            <option value="Pokhara">Pokhara</option>
           </select>
         </div>
         <div class="input-box">
           <span>Pick-up Date</span>
-          <input
-            type="date"
-            name="pickUpDate"
-            v-model="pickUpDate"
-            id="pickDate"
-          />
+          <input type="date" name="pickUpDate" v-model="pickUpDate" id="pickDate" />
         </div>
         <div class="input-box">
           <span>Return Date</span>
-          <input
-            type="date"
-            name="returnDate"
-            v-model="returnDate"
-            id="retDate"
-          />
+          <input type="date" name="returnDate" v-model="returnDate" id="retDate" />
         </div>
         <input type="submit" value="Submit" class="btn" />
       </form>
@@ -72,29 +63,22 @@
       <span>Nearby Vehicles</span>
     </div>
     <div class="services-container">
-      <div
-        class="box"
-        v-for="(vehicle, index) in vehicles.slice(0, 6)"
-        :key="index"
-      >
+      <div class="box" v-for="(vehicle, index) in vehicles.slice(0, 6)" :key="index">
         <div class="box-img">
-          <img :src="`http://localhost:3000/api/images/${vehicle[5]}`" alt="" />
+          <img :src="`http://localhost:3000/api/images/${vehicle[2]}`" alt="Car Img" />
         </div>
         <p></p>
-        <h3>{{ vehicle[2] }}</h3>
-        <h2>{{ vehicle[4] }}</h2>
-        <h2>Rs. {{ vehicle[6] }} <span>/day</span></h2>
-        <router-link
-          :to="{
-            path: '/quote',
-            query: {
-              vehicleId: vehicle.vehicle_id,
-              pickUpDate: pickUpDate,
-              returnDate: returnDate,
-            },
-          }"
-          class="btn"
-        >
+        <h3>{{ vehicle[7] }}</h3>
+        <h2>{{ vehicle[1] }}</h2>
+        <h2>Rs. {{ vehicle[3] }} <span>/day</span></h2>
+        <router-link :to="{
+          path: '/quote',
+          query: {
+            vehicleId: vehicle[0],
+            pickUpDate: pickUpDate,
+            returnDate: returnDate,
+          },
+        }" class="btn">
           Rent Now
         </router-link>
       </div>
@@ -102,25 +86,47 @@
   </section>
   <!-- Algorithm section -->
 
+  <!-- Content based Algorithm -->
+  <section class="services" v-if="userLog && vehicles.length > 0">
+    <div class="heading">
+      <span>You Might be Interested In</span>
+    </div>
+    <div class="services-container">
+      <div class="box" v-for="(vehicle, index) in recommendedVehicles" :key="index">
+        <div class="box-img">
+          <img :src="`http://localhost:3000/api/images/${vehicle.carimg}`" alt="Car Img" />
+        </div>
+        <h3>{{ vehicle.manufacturer }}</h3>
+        <h2>{{ vehicle.model }}</h2>
+        <h2>Rs. {{ vehicle.dailyfare }} <span>/day</span></h2>
+        <router-link :to="{
+          path: '/quote',
+          query: {
+            vehicleId: vehicle.vehicle_id,
+            pickUpDate: pickUpDate,
+            returnDate: returnDate,
+          },
+        }" class="btn">
+          Rent Now
+        </router-link>
+      </div>
+    </div>
+  </section>
+  <!-- Content based Algorithm -->
+
   <!-- Services -->
   <section class="services" id="services">
     <div class="heading">
       <span>Featured Vehicles</span>
     </div>
     <div class="services-container">
-      <div
-        v-for="(vehicle, index) in featuredVehicles"
-        :key="index"
-        class="box"
-      >
+      <div v-for="(vehicle, index) in featuredVehicles" :key="index" class="box">
         <div class="box-img">
-          <img
-            :src="`http://localhost:3000/api/images/${vehicle.carimg}`"
-            alt=""
-          />
+          <img :src="`http://localhost:3000/api/images/${vehicle.carimg}`" alt="" />
         </div>
         <p></p>
-        <h3>{{ vehicle.model }}</h3>
+        <h3>{{ vehicle.manufacturer }}</h3>
+        <h2>{{ vehicle.model }}</h2>
         <h2>{{ vehicle.availablelocation }}</h2>
 
         <h2>Rs. {{ vehicle.dailyfare }} <span>/day</span></h2>
@@ -159,68 +165,6 @@
     </div>
   </section>
 
-  <!-- Reviews -->
-  <!-- <section class="reviews" id="reviews">
-    <div class="heading">
-      <span>Reviews</span>
-      <h1>What our Customers Saying</h1>
-    </div>
-    <div class="reviews-container">
-      <div class="box">
-        <div class="rev-img">
-          <img src="../../public/assets/images/rev1.jpg" alt="" />
-        </div>
-        <h2>Someone Name</h2>
-        <div class="stars">
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star-half"></i>
-        </div>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nemo tempore
-          distinctio dicta, est molestiae error quis sint magnam.
-        </p>
-      </div>
-      <div class="box">
-        <div class="rev-img">
-          <img src="../../public/assets/images/rev2.jpg" alt="" />
-        </div>
-        <h2>Someone Name</h2>
-        <div class="stars">
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star-half"></i>
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta,
-          laborum quod veniam quasi quam sequi delectus ut facere.
-        </p>
-      </div>
-      <div class="box">
-        <div class="rev-img">
-          <img src="../../public/assets/images/rev3.jpg" alt="" />
-        </div>
-        <h2>Someone Name</h2>
-        <div class="stars">
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star"></i>
-          <i class="bx bxs-star-half"></i>
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Facilis
-          dolores vero beatae accusamus! Aliquam distinctio consectetur
-          molestias eos?
-        </p>
-      </div>
-    </div>
-  </section> -->
-
   <div class="copyright">
     <p>&#169; OnlineVehicleReservation All Right Reserved</p>
   </div>
@@ -247,39 +191,31 @@ export default {
       location2: null,
       vehicles: [],
       featuredVehicles: [],
+      recommendedVehicles: [],
     };
   },
   created() {
     this.fetchUserData();
     this.fetchVehicles();
     this.fetchFeaturedVehicles();
+    this.fetchRecommendedVehicles();
   },
   mounted() {
-    //Get user's geolocation
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          this.location1 = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
+    this.getUserGeolocation()
+      .then(() => {
+        // Now fetch vehicles and calculate distances
+        this.fetchVehicles();
+      })
+      .catch((error) => {
+        console.error("Error getting geolocation:", error);
+        // Proceed without location1 if necessary
+        this.fetchVehicles();
+      });
 
-          console.log("Location1:", this.location1);
-        },
-        (error) => {
-          console.error("Error getting geolocation:", error);
-          // Handle the error if needed
-        }
-      );
-    } else {
-      console.error("Geolocation not supported");
-      // Handle the case where geolocation is not supported
-    }
-
-    var date = new Date();
-    var tdate = date.getDate();
-    var month = date.getMonth() + 1;
-    var year = date.getUTCFullYear();
+    let date = new Date();
+    let tdate = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getUTCFullYear();
 
     if (tdate < 10) {
       tdate = "0" + tdate;
@@ -288,28 +224,51 @@ export default {
       month = "0" + month;
     }
 
-    var minDate = year + "-" + month + "-" + tdate;
+    let minDate = year + "-" + month + "-" + tdate;
 
     document.getElementById("pickDate").setAttribute("min", minDate);
 
     document.getElementById("pickDate").addEventListener("input", function () {
-      var selectedDate = new Date(document.getElementById("pickDate").value);
-      var year = selectedDate.getFullYear();
-      var month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
-      var day = selectedDate.getDate().toString().padStart(2, "0");
-      var minDate = year + "-" + month + "-" + day;
+      let selectedDate = new Date(document.getElementById("pickDate").value);
+      let year = selectedDate.getFullYear();
+      let month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+      let day = selectedDate.getDate().toString().padStart(2, "0");
+      let minDate = year + "-" + month + "-" + day;
       document.getElementById("retDate").setAttribute("min", minDate);
     });
   },
   methods: {
+    getUserGeolocation() {
+      return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              this.location1 = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              };
+              console.log("User's geolocation:", this.location1);
+              resolve();
+            },
+            (error) => {
+              console.error("Error getting geolocation:", error.message);
+              reject(error);
+            }
+          );
+        } else {
+          console.error("Geolocation not supported");
+          reject(new Error("Geolocation not supported"));
+        }
+      })
+    },
     async fetchVehicles() {
       try {
         const response = await axios.get("/api/vehicle/locations");
         this.vehicles = response.data;
         if (this.vehicles.length > 0) {
           const [latitude, longitude] = [
-            this.vehicles[0][12],
-            this.vehicles[0][14],
+            this.vehicles[0][13],
+            this.vehicles[0][15],
           ];
           this.location2 = { latitude, longitude };
           console.log("Location2: ", this.location2);
@@ -318,32 +277,27 @@ export default {
       } catch (error) {
         console.error(error);
       }
-      // .then((response) => {
-      //   this.vehicles = response.data;
-      //   console.log("Vehicles:", this.vehicles);
-
-      //   if (this.vehicles.length > 0) {
-      //     const [latitude, longitude] = [
-      //       this.vehicles[0][11],
-      //       this.vehicles[0][13],
-      //     ];
-      //     this.location2 = { latitude, longitude };
-      //     console.log("Location2: ", this.location2);
-
-      //     this.calculateDistances();
-      //   }
-      // })
-      // .catch((error) => {
-      //   console.error(error);
-      // });
     },
 
+    fetchRecommendedVehicles() {
+      const userId = 52; // Replace with the logged-in user's ID
+
+      axios.get(`http://localhost:3000/api/vehicle/recommended/${userId}`)
+        .then((response) => {
+          this.recommendedVehicles = response.data; 
+          console.log('Fetched recommended vehicles:', this.recommendedVehicles);
+        })
+        .catch((error) => {
+          console.error('Error fetching recommended vehicles:', error);
+        });
+    },
     calculateDistances() {
+      console.log("Calculating distances...");
       if (this.location1 && this.location2) {
         this.vehicles.forEach((vehicle) => {
           const vehicleLocation = {
-            latitude: vehicle[12],
-            longitude: vehicle[14],
+            latitude: vehicle[13],
+            longitude: vehicle[15],
           };
           vehicle.distance = this.calculateDistance(
             this.location1,
@@ -380,14 +334,15 @@ export default {
       const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos(degToRad(lat1)) *
-          Math.cos(degToRad(lat2)) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
+        Math.cos(degToRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       const distance = earthRadius * c;
       console.log("Distance", distance);
       return distance;
     },
+
     async fetchFeaturedVehicles() {
       try {
         const response = await axios.get("/api/vehicle/all");

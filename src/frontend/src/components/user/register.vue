@@ -49,6 +49,23 @@
         />
       </div>
       <div class="form-group">
+        <label for="">Select Categories (at least one):</label>
+        <select
+          v-model="user.categories"
+          multiple
+          class="form-control"
+          size="5"
+        >
+          <option
+            v-for="category in categories"
+            :key="category.category_id"
+            :value="category.category_name"
+          >
+            {{ category.category_name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="">Address: </label>
         <input
           type="text"
@@ -85,37 +102,32 @@ export default {
         contact: "",
         address: "",
         license_name: null,
+        categories: [],
         // role: "USER"
       },
+      categories: [],
     };
+  },
+  created() {
+    this.fetchCategories();
   },
   methods: {
     handleFileUpload(event) {
       this.user.license_name = event.target.files[0];
+    },
+    fetchCategories() {
+      axios
+        .get("/api/category/all")
+        .then((response) => {
+          this.categories = response.data; // Populate the dropdown with categories
+        })
+        .catch((error) => console.error("Error fetching categories:", error));
     },
     save() {
       if (this.user.name == "" || this.user.name == null) {
         alert("user is required!");
         return;
       } else {
-        // fetch("/api/user/register", {
-        //   method: "POST",
-        //   headers: {
-        //     Accpet: "application/json",
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     name: this.user.name,
-        //     email: this.user.email,
-        //     password: this.user.password,
-        //     contact: this.user.contact,
-        //     address: this.user.address,
-        //     // role: this.user.role
-        //   }),
-        // }).then(() => {
-        //   alert("Registerd successfully"),
-        //     (window.location.href = "/user/dashboard");
-        // });
         const formData = new FormData();
 
         const userData = {
@@ -124,6 +136,7 @@ export default {
           password: this.user.password,
           contact: this.user.contact,
           address: this.user.address,
+          // categories: this.user.categories,
           // role: this.user.role
         };
 
@@ -132,6 +145,7 @@ export default {
           new Blob([JSON.stringify(userData)], { type: "application/json" })
         );
         formData.append("image", this.user.license_name);
+        formData.append("categories", this.user.categories);
 
         axios
           .post("/api/user/register", formData, {

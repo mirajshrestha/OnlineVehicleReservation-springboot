@@ -34,7 +34,7 @@
                 >
               </li>
               <li class="nav-item py-2 py-sm-0">
-                <a href="#" class="nav-link text-white"
+                <a href="/owner/bookings" class="nav-link text-white"
                   ><i class="bx bx-book-content"></i
                   ><span class="fs-6 d-none ms-3 d-sm-inline">Bookings</span></a
                 >
@@ -53,7 +53,6 @@
               ><span class="ms-2">{{ owner.fullname }}</span>
             </button>
             <div class="dropdown-menu" aria-labelledby="triggerId">
-              <button class="dropdown-item" href="#">Profile</button>
               <button class="dropdown-item" href="#" @click="logout">
                 Logout
               </button>

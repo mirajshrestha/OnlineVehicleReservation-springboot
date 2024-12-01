@@ -6,9 +6,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.ovr.onlinevehicle.reservation.helper.VehicleWithScore;
+import com.ovr.onlinevehicle.reservation.model.User;
+import com.ovr.onlinevehicle.reservation.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -29,6 +33,9 @@ public class VehicleService {
 	
 	@Autowired
 	private BookingRepository bookingRepository;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	public void registerVehicle(Vehicles vehicles) {
 		vehicleRepository.save(vehicles);
@@ -107,7 +114,43 @@ public class VehicleService {
             throw new EntityNotFoundException("Vehicle not found with ID: " + vehicleId);
         }
     }
-	
 
+	public List<Object[]> getVehiclesWithCategories() {
+		return vehicleRepository.findVehiclesWithCategories();
+	}
 
+	public List<Vehicles> getRecommendedVehicles(Long userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		String userCategoriesStr  = user.getCategories();
+		if(userCategoriesStr  == null || userCategoriesStr .isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		List<String> userCategories = Arrays.asList(userCategoriesStr .split(","));
+
+		List<Vehicles> allVehicles = vehicleRepository.findAll();
+
+		List<VehicleWithScore> scoredVehicles = new ArrayList<>();
+		for (Vehicles vehicle : allVehicles) {
+			int score = calculateSimilarity(userCategories, vehicle.getCategory());
+			if (score > 0) {
+				scoredVehicles.add(new VehicleWithScore(vehicle, score));
+			}
+		}
+
+		scoredVehicles.sort((v1, v2) -> Integer.compare(v2.getScore(), v1.getScore()));
+
+		List<Vehicles> recommendedVehicles = new ArrayList<>();
+		for (VehicleWithScore scoredVehicle : scoredVehicles) {
+			recommendedVehicles.add(scoredVehicle.getVehicle());
+		}
+
+        return recommendedVehicles;
+	}
+
+	private int calculateSimilarity(List<String> userCategories, String vehicleCategory) {
+		return userCategories.contains(vehicleCategory) ? 1 : 0;
+	}
 }

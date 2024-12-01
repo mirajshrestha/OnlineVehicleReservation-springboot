@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from 'vue-router'
 import HomePage from './components/HomeComponent.vue';
 import OwnerSignIn from './components/owner/owner-signin.vue';
 import ownerRegister from './components/owner/register.vue';
+import ownerBookings from './components/owner/bookings.vue';
 import userLogin from './components/user/login.vue';
 import userRegister from './components/user/register.vue';
 import userDashboard from './components/user/dashboard.vue';
@@ -85,6 +86,11 @@ const routes = [
         path: '/owner/edit-vehicle/:vehicleId',
         name: 'editVehicle',
         component: editVehicle
+    },
+    {
+        path: '/owner/bookings',
+        name: 'ownerBookings',
+        component: ownerBookings
     },
     {
         path: '/search',

@@ -34,7 +34,7 @@
                 >
               </li>
               <li class="nav-item py-2 py-sm-0">
-                <a href="#" class="nav-link text-white"
+                <a href="/owner/bookings" class="nav-link text-white"
                   ><i class="bx bx-book-content"></i
                   ><span class="fs-6 d-none ms-3 d-sm-inline">Bookings</span></a
                 >
@@ -53,7 +53,6 @@
               ><span class="ms-2">{{ owner.fullname }}</span>
             </button>
             <div class="dropdown-menu" aria-labelledby="triggerId">
-              <button class="dropdown-item" href="#">Profile</button>
               <button class="dropdown-item" href="#" @click="logout">
                 Logout
               </button>
@@ -94,6 +93,11 @@
             />
             <label for="">To Date:</label>
             <input type="date" v-model="vehicle.todate" class="form-control" />
+            <label for="">Category:</label>
+            <select v-model="vehicle.category" class="form-control">
+              <option value="">---Select Category---</option>
+              <option v-for="category in categories" :key="category.category_id" :value="category.category_name">{{ category.category_name }}</option>
+            </select>
             <label for="">Available Location:</label>
             <select v-model="vehicle.availablelocation" class="form-control">
               <option value="">---Select Location---</option>
@@ -150,16 +154,19 @@ export default {
         fromdate: "",
         todate: "",
         availablelocation: "",
+        category: "",
         description: "",
         owners_id: "",
         carimg: null,
       },
       locations: [],
+      categories: [],
     };
   },
   created() {
     this.fetchUserData();
     this.fetchLocations();
+    this.fetchCategories();
   },
   methods: {
     handleFileUpload(event) {
@@ -175,6 +182,7 @@ export default {
         fromdate: this.vehicle.fromdate,
         todate: this.vehicle.todate,
         availablelocation: this.vehicle.availablelocation,
+        category: this.vehicle.category,
         description: this.vehicle.description,
         owners_id: this.owner.owners_id,
       };
@@ -204,18 +212,7 @@ export default {
       console.log("working");
 
       console.log("Formdata:", formData);
-      // fetch("/api/vehicle/add", {
-      //   method: "POST",
-      //   body: formData,
-      // })
-      //   .then((response) => {
-      //     if(!response.ok){
-      //       throw new Error("HTTP error! Status: ${response.status}");
-      //     }
-      //     return response.json();
-      //   })
-      //   .catch((error) => console.error("Error registering vehicle: ", error));
-
+      
       axios
         .post("/api/vehicle/add", formData, {
           headers: {
@@ -249,6 +246,17 @@ export default {
         })
         .catch((error) => {
           console.error("Error fetching locations:", error);
+        });
+    },
+
+    fetchCategories() {
+      axios
+        .get("/api/category/all")
+        .then((response) => {
+          this.categories = response.data; // Assuming the response is an array of categories
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
         });
     },
 

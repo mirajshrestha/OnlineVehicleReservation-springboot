@@ -25,6 +25,7 @@ public class Vehicles {
 	private Date fromdate;
 	private Date todate;
 	private String availablelocation;
+	private String category;
 	private String feature;
 	private String description;
 	private String carimg;
@@ -42,7 +43,7 @@ public class Vehicles {
 	}
 
 	public Vehicles(Long vehicle_id, String manufacturer, String model, Integer dailyfare, Date fromdate, Date todate,
-			String availablelocation, String feature, String description, String carimg,
+			String availablelocation, String category,String feature, String description, String carimg,
 			Owners owners, List<Bookings> bookings) {
 		super();
 		this.vehicle_id = vehicle_id;
@@ -52,6 +53,7 @@ public class Vehicles {
 		this.fromdate = fromdate;
 		this.todate = todate;
 		this.availablelocation = availablelocation;
+		this.category = category;
 		this.feature = feature;
 		this.description = description;
 		this.carimg = carimg;
@@ -155,5 +157,11 @@ public class Vehicles {
 		this.feature = feature;
 	}
 
+	public String getCategory() {
+		return category;
+	}
 
+	public void setCategory(String category) {
+		this.category = category;
+	}
 }

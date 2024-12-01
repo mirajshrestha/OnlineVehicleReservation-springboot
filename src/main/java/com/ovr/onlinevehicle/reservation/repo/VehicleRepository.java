@@ -21,7 +21,9 @@ public interface VehicleRepository extends JpaRepository<Vehicles, Long>{
 	@Query(value = "SELECT * FROM vehicles LEFT JOIN locations ON vehicles.availablelocation = locations.location", nativeQuery = true)
 	List<Object[]> findVehiclesWithLocations();
 
-	
+	@Query(value = "SELECT * FROM vehicles LEFT JOIN category ON vehicles.category = category.category_name", nativeQuery = true)
+	List<Object[]> findVehiclesWithCategories();
 
-	
+	@Query("SELECT v FROM Vehicles v WHERE v.category IN :categories")
+	List<Vehicles> findByCategories(@Param("categories") List<String> categories);
 }
